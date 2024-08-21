@@ -30,7 +30,7 @@
         <div
           v-if="!disabled"
           class="ui-edit-btn ui-btn"
-          @click="() => emit('onUpdate', item)"
+          @click="() => emit('onSetting', item)"
         >
           <i class="fa fa-cog"></i>
         </div>
@@ -43,11 +43,11 @@
 import { onMounted, watch } from 'vue'
 import 'gridstack/dist/gridstack.min.css'
 import 'gridstack/dist/gridstack-extra.min.css'
-
 import { GridStack } from 'gridstack'
 import type { GridStackWidget, GridStackOptions, GridStackNode } from 'gridstack'
 
 let grid: GridStack
+
 const options: GridStackOptions = {
   // [x] ทำให้ Drag Drop ออกมาจาก parent Element
   acceptWidgets: false,
@@ -71,11 +71,11 @@ const options: GridStackOptions = {
 
   // []
   // columnOpts: {
-  // columnWidth: 12,
-  // columnMax: 12,
-  //   breakpoints: [{ w: 500, c: 12, layout: 'scale' }],
-  // breakpointForWindow: true,
-  // layout: 'compact',
+    // columnWidth: 12,
+    // columnMax: 12,
+    //   breakpoints: [{ w: 500, c: 12, layout: 'scale' }],
+    // breakpointForWindow: true,
+    // layout: 'compact',
   // },
 
   // [x] สำหรับ Disable Drag Element
@@ -108,12 +108,11 @@ const options: GridStackOptions = {
 
 const emit = defineEmits<{
   (e: 'onDelete', value: GridStackWidget): GridStackWidget
-  (e: 'onUpdate', value: GridStackWidget): GridStackWidget
-  (e: 'onMove', value: GridStackWidget): GridStackWidget
-  (e: 'onResize', value: GridStackWidget): GridStackWidget
+  (e: 'onSetting', value: GridStackWidget): GridStackWidget
+  (e: 'onUpdate', value: GridStackWidget[]): GridStackWidget[]
 }>()
 
-// TODO เป็นส่วนสำหรับ Define 2 way Models
+// [x] เป็นส่วนสำหรับ Define 2 way Models
 const disabled = defineModel<boolean>('disabled', {
   default: false,
 })
@@ -139,32 +138,21 @@ onMounted(async () => {
   //   console.log(e)
   // })
 
-  // []
-  // grid.on('change', (e: GridStackNode[]) => {
-  //   console.log(e)
-  // })
-
-  grid.on('change', (event: Event, nodes: GridStackNode[]) => {
-    console.log(nodes)
-    // nodes.forEach((node) => {
-    //   console.log(event, ' : ', node.id)
-    // console.log(`Widget with id: ${node.id} changed.`);
-    // console.log(`New position: (${node.x}, ${node.y})`);
-    // console.log(`New size: ${node.width} x ${node.height}`);
-    // })
+  // [x] สำหรับ แก้ไข Layout ของ Widget
+  grid.on('change', (_event: Event, nodes: GridStackNode[]) => {
+    nodes.forEach((node) => {
+      const itemToUpdate = items.value.find((item) => item.id === node.id)
+      if (itemToUpdate) {
+        Object.assign(itemToUpdate, {
+          x: node.x,
+          y: node.y,
+          w: node.w,
+          h: node.h,
+        })
+      }
+    })
+    emit('onUpdate', items.value)
   })
-
-  // grid.on('resizestart resize resizestop dragstart drag dragstop', (e: any) => {
-  //   console.log(e)
-  // })
-  // grid.on('enable')
-  // grid.on('change')
-  // grid.on( 'resizestart' | 'resize' | 'resizestop' | 'dragstart' | 'drag' | 'dragstop', callback: GridStackElementHandler): GridStack;
-  // }
-  // console.log('End of mounted')
-  //   grid.on('resize',(e: GridStackElementHandler):GridStack =>{
-  // return
-  //   }
 })
 
 // TODO Watch for changes in the prop and update the local variable accordingly
@@ -180,19 +168,22 @@ watch(
 watch(
   () => items.value,
   async (newValue: GridStackWidget[]) => {
-    if (grid) {
-      const oldItems = await grid.getGridItems()
+    if (!grid) return
 
-      // TODO Find elements in newValue that are not in oldValue
-      const addedItems = newValue.filter((newItem) => !oldItems.some((oldItem) => oldItem.id === newItem.id))
-      addedItems.forEach(async (widget) => grid.makeWidget(`#${widget.id}`))
+    const oldItems = await grid.getGridItems()
 
-      // TODO Find elements in oldValue that are not in newValue
-      const removedItems = oldItems.filter((oldItem) => !newValue.some((newItem) => newItem.id === oldItem.id))
-      removedItems.forEach(async (widget) => grid.removeWidget(`#${widget.id}`, true))
+    // [x] Find elements in newValue that are not in oldItems
+    const addedItems = newValue.filter((newItem) => !oldItems.some((oldItem) => oldItem.id === newItem.id))
+    const removedItems = oldItems.filter((oldItem) => !newValue.some((newItem) => newItem.id === oldItem.id))
 
-      grid.compact()
-    }
+    // [x] Add new widgets
+    await Promise.all(addedItems.map(async (widget) => grid.makeWidget(`#${widget.id}`)))
+
+    // [x] Remove old widgets
+    await Promise.all(removedItems.map(async (widget) => grid.removeWidget(`#${widget.id}`, true)))
+
+    // [] Clear All Grid Position
+    grid.compact('compact', true)
   },
   { deep: true, immediate: true }
 )
