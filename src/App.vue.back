@@ -1,0 +1,220 @@
+<template>
+  <div
+    style="width: 100%; height: 100%"
+    id="app"
+  >
+    <button @click="onAddItem">Add</button>
+    <button @click="onRemoveAll">Remove All</button>
+    <button @click="onDisable">Disable</button>
+    <button @click="onEnable">Enable</button>
+    <button @click="onEnableMove(true)">Enable Move</button>
+    <button @click="onEnableMove(false)">Disable Move</button>
+    <button @click="onEnableResize(true)">Enable Resize</button>
+    <button @click="onEnableResize(false)">Disable Resize</button>
+    <div
+      :class="enable ? 'enable-edit' : ''"
+      style="width: 90%; height: 90%"
+      class="bg"
+    >
+      <div class="grid-stack">
+        <div
+          class="grid-stack-item"
+          v-for="item in items"
+          :gs-w="item.w"
+          :gs-h="item.h"
+          :gs-id="item.id"
+          :id="item.id"
+          :key="item.id"
+          :gs-auto-position="true"
+        >
+          <div class="grid-stack-item-content">
+            <c1></c1>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<!-- Ref https://www.binarcode.com/blog/build-interactive-dashboards-with-vuejs-and-tailwind -->
+<script setup lang="ts">
+import { onMounted, ref } from 'vue'
+import 'gridstack/dist/gridstack.min.css'
+import 'gridstack/dist/gridstack-extra.min.css'
+import { GridStack, type GridStackWidget, type GridStackOptions } from 'gridstack'
+import c1 from './components/com_1.vue'
+let grid: GridStack
+let increment: number = 0
+let enable = ref(true)
+
+// const itemsx = ref<GridStackWidget[]>([
+//   { id: 'widget-1', x: 0, y: 0, w: 3, h: 2, content: 'Widget 1' },
+//   { id: 'widget-2', x: 3, y: 0, w: 3, h: 2, content: 'Widget 2' },
+// ])
+
+const defaultItem: GridStackWidget = { content: '', w: 2, h: 2, id: `ele-id-${increment}`, noResize: false, noMove: false, locked: false }
+const items = ref<GridStackWidget[]>([])
+const options: GridStackOptions = {
+  // [x] ทำให้ Drag Drop ออกมาจาก parent Element
+  acceptWidgets: false,
+
+  // [x] สำหรับ show resize button
+  alwaysShowResizeHandle: true,
+
+  // [x] สำหรับ animation สำหรับการ Swap items
+  animate: true,
+
+  // []
+  auto: false,
+
+  // []
+  // cellHeight: 'auto',
+
+  // cellHeightThrottle: 100,
+
+  // [x] สำหรับแก้จำนวน column Default:12
+  column: 12,
+
+  // []
+  // columnOpts: {
+  // columnWidth: 12,
+  // columnMax: 12,
+  //   breakpoints: [{ w: 500, c: 12, layout: 'scale' }],
+  // breakpointForWindow: true,
+  // layout: 'compact',
+  // },
+
+  // [x] สำหรับ Disable Drag Element
+  disableDrag: false,
+  // [x] สำหรับ Resize Element
+  disableResize: false,
+  // [x] สำหรับทำ ให้ Element ลอยขึ้นด้านบน
+  float: false,
+
+  margin: 5,
+  // marginTop: 5,
+  // marginRight: 5,
+  // marginBottom: 5,
+  // marginLeft: 5,
+
+  // [x] สำหรับตั้งค่า Edge ในการ Resize element
+  resizable: { autoHide: true, handles: 'se' },
+
+  // [x] สำหรับลบ Element เมื่อ Drag Element ออกนอก Parent Element
+  removable: false,
+
+  // [x] สำหรับปิดการใช้งาน DragDrop , Resize
+  staticGrid: false,
+
+  // column: 4,
+  cellHeight: 100,
+  minRow: 1,
+  // margin: 10
+}
+
+const onAddItem = () => {
+  // increment++
+  // const widget: GridStackWidget = defaultItem
+  // if (grid) grid.addWidget(widget)
+
+  const id = Date.now()
+  items.value.push({ ...defaultItem, ...{ id: `id_${id}` } })
+  setTimeout(() => {
+    grid.makeWidget(`#id_${id}`)
+  }, 10)
+}
+
+// TODO เป็น Function สำหรับ Remove All widgets
+const onRemoveAll = () => {
+  items.value = []
+  if (grid) grid.removeAll()
+}
+// TODO เป็น Function ในการ Disable widgets moving/resizing
+const onDisable = () => {
+  enable.value = false
+  if (grid) grid.disable()
+}
+
+// TODO เป็น Function ในการ Enable widgets moving/resizing
+const onEnable = () => {
+  enable.value = true
+  if (grid) grid.enable()
+}
+
+// TODO เป็น Function สำหรับการ เปิด/ปิด Feature Move
+const onEnableMove = (val: boolean = true) => {
+  enable.value = val
+  if (grid) grid.enableMove(val)
+}
+
+// TODO เป็น Function สำหรับการ เปิด/ปิด Feature Resize
+const onEnableResize = (val: boolean = true) => {
+  enable.value = val
+  if (grid) grid.enableResize(val)
+}
+
+onMounted(async () => {
+  // console.log(render(h(c1)))
+  grid = GridStack.init(options)
+
+  const e: GridStackWidget[] = Array(0)
+    .fill(0)
+    .map((ele: number, idx: number): GridStackWidget => {
+      return { ...defaultItem, ...{ id: `id_${idx}` } }
+    })
+
+  items.value = e
+
+  setTimeout(() => {
+    items.value.forEach((widget) => {
+      console.log(widget.id, document.getElementById(`${widget.id}`))
+      grid.makeWidget(`#${widget.id}`)
+    })
+  }, 100)
+
+  // items.value = e
+  // grid.load([])
+  // if (grid) {
+  // grid.load(i)
+
+  // TODO Register Event for GridStack
+  // grid.on('disable enable', (e: GridStackDroppedHandler) => {
+  //   console.log(e)
+  // })
+
+  // grid.on('change added removed', (e: GridStackDroppedHandler) => {
+  //   console.log(e)
+  // })
+
+  // grid.on('enable')
+  // grid.on('change')
+  // grid.on( 'resizestart' | 'resize' | 'resizestop' | 'dragstart' | 'drag' | 'dragstop', callback: GridStackElementHandler): GridStack;
+  // }
+  // console.log('End of mounted')
+})
+</script>
+
+<style lang="scss">
+.grid-stack {
+  // background: red;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+.grid-stack-item-content {
+  background-color: #18bc9c;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+.bg {
+  overflow: scroll;
+}
+.bg.enable-edit {
+  --dot-bg: rgb(255, 255, 255);
+  --dot-color: rgb(0, 0, 0);
+  --dot-size: 1.1px;
+  --dot-space: 1rem;
+  background: linear-gradient(90deg, var(--dot-bg) calc(var(--dot-space) - var(--dot-size)), transparent 1%) center / var(--dot-space) var(--dot-space), linear-gradient(var(--dot-bg) calc(var(--dot-space) - var(--dot-size)), transparent 1%) center / var(--dot-space) var(--dot-space),
+    var(--dot-color);
+}
+</style>
