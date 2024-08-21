@@ -35,11 +35,11 @@
 import { ref } from 'vue'
 import gridStack from './components/GridStack/gridStack.vue'
 const items = ref([
-  { id: 'id_1', x: 0, y: 0, w: 3, h: 4, content: '' },
-  { id: 'id_2', x: 3, y: 0, w: 3, h: 2, content: '' },
-  { id: 'id_3', x: 6, y: 0, w: 6, h: 2, content: 'Widget 3' },
-  { id: 'id_1724245557342', x: 3, y: 2, w: 3, h: 2, content: '' },
-  { id: 'id_1724245566475', x: 6, y: 2, w: 6, h: 2, content: '' },
+  { id: 'id_1', x: 11, y: 0, w: 31, h: 2, content: '' },
+  { id: 'id_2', x: 42, y: 0, w: 18, h: 2, content: '' },
+  { id: 'id_3', x: 11, y: 2, w: 31, h: 2, content: 'Widget 3' },
+  { id: 'id_1724245557342', x: 0, y: 0, w: 11, h: 4, content: '' },
+  { id: 'id_1724245566475', x: 42, y: 2, w: 18, h: 2, content: '' },
 ])
 
 const disabled = ref<boolean>(false)

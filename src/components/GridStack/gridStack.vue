@@ -45,7 +45,6 @@ import 'gridstack/dist/gridstack.min.css'
 import 'gridstack/dist/gridstack-extra.min.css'
 import { GridStack } from 'gridstack'
 import type { GridStackWidget, GridStackOptions, GridStackNode } from 'gridstack'
-
 let grid: GridStack
 
 const options: GridStackOptions = {
@@ -67,21 +66,21 @@ const options: GridStackOptions = {
   // cellHeightThrottle: 100,
 
   // [x] สำหรับแก้จำนวน column Default:12
-  column: 12,
+  column: 60,
 
   // []
   // columnOpts: {
-    // columnWidth: 12,
-    // columnMax: 12,
-    //   breakpoints: [{ w: 500, c: 12, layout: 'scale' }],
-    // breakpointForWindow: true,
-    // layout: 'compact',
+  // columnWidth: 12,
+  // columnMax: 12,
+  //   breakpoints: [{ w: 500, c: 12, layout: 'scale' }],
+  // breakpointForWindow: true,
+  // layout: 'compact',
   // },
 
   // [x] สำหรับ Disable Drag Element
-  disableDrag: false,
+  disableDrag: true,
   // [x] สำหรับ Resize Element
-  disableResize: false,
+  disableResize: true,
   // [x] สำหรับทำ ให้ Element ลอยขึ้นด้านบน
   float: false,
 
@@ -183,7 +182,8 @@ watch(
     await Promise.all(removedItems.map(async (widget) => grid.removeWidget(`#${widget.id}`, true)))
 
     // [] Clear All Grid Position
-    grid.compact('compact', true)
+    await grid.compact()
+    console.log('compact success')
   },
   { deep: true, immediate: true }
 )
@@ -243,5 +243,19 @@ watch(
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+
+// TODO Grid Stack Columns Configuration
+$columns: 60;
+@function fixed($float) {
+  @return calc(round($float * 1000) / 1000); // total 4-5 digits being %
+}
+.gs-#{$columns} > .grid-stack-item {
+  width: fixed(calc(100% / $columns));
+  @for $i from 1 through $columns - 1 {
+    &[gs-x='#{$i}'] { left: fixed(calc(100% / $columns) * $i); }
+    &[gs-w='#{$i+1}'] { width: fixed(calc(100% / $columns) * ($i+1)); }
+  }
 }
 </style>
