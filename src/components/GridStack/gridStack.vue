@@ -66,7 +66,7 @@ const options: GridStackOptions = {
   // cellHeightThrottle: 100,
 
   // [x] สำหรับแก้จำนวน column Default:12
-  column: 60,
+  // column: 12,
 
   // []
   // columnOpts: {
@@ -181,9 +181,8 @@ watch(
     // [x] Remove old widgets
     await Promise.all(removedItems.map(async (widget) => grid.removeWidget(`#${widget.id}`, true)))
 
-    // [] Clear All Grid Position
+    // [x] Clear All Grid Position
     await grid.compact()
-    console.log('compact success')
   },
   { deep: true, immediate: true }
 )
@@ -191,10 +190,10 @@ watch(
 
 <style lang="scss">
 .grid-stack {
-  // background: red;
+  background: red !important;
   padding: 0;
   width: 100%;
-  height: 100%;
+  // height: 100% ;
 }
 
 .grid-stack-item-content {
@@ -247,15 +246,16 @@ watch(
 
 
 // TODO Grid Stack Columns Configuration
-$columns: 60;
-@function fixed($float) {
-  @return calc(round($float * 1000) / 1000); // total 4-5 digits being %
-}
-.gs-#{$columns} > .grid-stack-item {
-  width: fixed(calc(100% / $columns));
-  @for $i from 1 through $columns - 1 {
-    &[gs-x='#{$i}'] { left: fixed(calc(100% / $columns) * $i); }
-    &[gs-w='#{$i+1}'] { width: fixed(calc(100% / $columns) * ($i+1)); }
-  }
-}
+// https://github.com/gridstack/gridstack.js/blob/master/spec/e2e/html/810-many-columns.css
+// $columns: 48;
+// @function fixed($float) {
+//   @return calc(round($float * 1000) / 1000); // total 4-5 digits being %
+// }
+// .gs-#{$columns} > .grid-stack-item {
+//   width: fixed(calc(100% / $columns));
+//   @for $i from 1 through $columns - 1 {
+//     &[gs-x='#{$i}'] { left: fixed(calc(100% / $columns) * $i); }
+//     &[gs-w='#{$i}'] { width: fixed(calc(100% / $columns) * ($i)); }
+//   }
+// }
 </style>
