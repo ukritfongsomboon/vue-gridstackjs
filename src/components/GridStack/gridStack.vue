@@ -36,12 +36,16 @@
         >
           <i class="fa fa-cog"></i>
         </div>
+        <div class="ui-btn ui-title">
+          {{ item?.title }}
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { modelItem, modelItems } from './type'
 import { onMounted, watch } from 'vue'
 import 'gridstack/dist/gridstack.min.css'
 import 'gridstack/dist/gridstack-extra.min.css'
@@ -68,7 +72,7 @@ const options: GridStackOptions = {
   // cellHeightThrottle: 100,
 
   // [x] สำหรับแก้จำนวน column Default:12
-  column: 24,
+  column: 12,
 
   // []
   // columnOpts: {
@@ -108,16 +112,17 @@ const options: GridStackOptions = {
 }
 
 const emit = defineEmits<{
-  (e: 'onDelete', value: GridStackWidget): GridStackWidget
-  (e: 'onSetting', value: GridStackWidget): GridStackWidget
-  (e: 'onUpdate', value: GridStackWidget[]): GridStackWidget[]
+  (e: 'onDelete', value: modelItem): modelItem
+  (e: 'onSetting', value: modelItem): modelItem
+  (e: 'onUpdate', value: modelItems): modelItems
+  (e: 'onCreate', value: modelItem): modelItem
 }>()
 
 // [x] เป็นส่วนสำหรับ Define 2 way Models
 const disabled = defineModel<boolean>('disabled', {
   default: false,
 })
-const items = defineModel<GridStackWidget[]>('items', {
+const items = defineModel<modelItems>('items', {
   default: () => [],
 })
 
@@ -164,6 +169,7 @@ onMounted(async () => {
         items.value[idx].x = x.x
         items.value[idx].y = x.y
         items.value[idx].autoPosition = false
+        emit('onCreate', items.value[idx])
       }
     }
   })
@@ -273,7 +279,7 @@ watch(
 
 // TODO Grid Stack Columns Configuration
 // https://github.com/gridstack/gridstack.js/blob/master/spec/e2e/html/810-many-columns.css
-$columns: 24;
+$columns: 12;
 @function fixed($float) {
   @return calc(round($float * 1000) / 1000); // total 4-5 digits being %
 }
