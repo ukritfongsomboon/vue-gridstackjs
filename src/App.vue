@@ -40,9 +40,9 @@
       </li>
     </u> -->
     <!-- <textarea style="width: 50%; height: 50%"> {{ items }} </textarea> -->
-    <br>
+    <br />
     {{ items }}
-    <br>
+    <br />
     .
   </div>
 </template>
@@ -51,25 +51,17 @@
 import { ref } from 'vue'
 import gridStack from './components/GridStack/gridStack.vue'
 const items = ref([
-  { id: 'id_1724252312192', x: 0, y: 0, w: 3, h: 2, content: '' },
-  { id: 'id_1724252313282', x: 0, y: 2, w: 5, h: 2, content: '' },
-  { id: 'id_1724252388593', x: 3, y: 0, w: 2, h: 2, content: '' },
-  { id: 'id_1724252389053', x: 5, y: 0, w: 3, h: 2, content: '' },
-  { id: 'id_1724252389210', x: 5, y: 2, w: 7, h: 2, content: '' },
-  { id: 'id_1724252391018', x: 8, y: 0, w: 2, h: 2, content: '' },
-  { id: 'id_1724252391646', x: 10, y: 0, w: 2, h: 2, content: '' },
-  { id: 'id_1724252440623', x: 0, y: 4, w: 2, h: 4, content: '' },
-  { id: 'id_1724252440778', x: 0, y: 0, w: 2, h: 2, content: '' },
-  { id: 'id_1724252440940', x: 4, y: 4, w: 2, h: 4, content: '' },
-  { id: 'id_1724252441096', x: 0, y: 0, w: 2, h: 2, content: '' },
-  { id: 'id_1724252441254', x: 8, y: 4, w: 4, h: 4, content: '' },
-  { id: 'id_1724252441728', x: 0, y: 0, w: 2, h: 2, content: '' },
-  { id: 'id_1724252442079', x: 0, y: 0, w: 2, h: 2, content: '' },
+  { id: 'id_7', x: 0, y: 0, w: 8, h: 4, content: '', autoPosition: false },
+  { id: 'id_2', x: 17, y: 2, w: 7, h: 2, content: '' },
+  { id: 'id_3', x: 8, y: 0, w: 8, h: 2, content: '' },
+  { id: 'id_5', x: 8, y: 2, w: 5, h: 2, content: '' },
+  { id: 'id_6', x: 13, y: 2, w: 4, h: 2, content: '' },
+  { id: 'id_1', x: 16, y: 0, w: 8, h: 2, content: '' },
 ])
 
 const disabled = ref<boolean>(false)
 // let onCreate = null
-const a = () => items.value.push({ id: `id_${Date.now()}`, x: 0, y: 0, w: 2, h: 2, content: '' })
+const a = () => items.value.push({ id: `id_${Date.now()}`, x: 0, y: 0, w: 2, h: 2, content: '', autoPosition: true })
 
 const onRemove = (item: any) => {
   items.value = items.value.filter((existingItem) => existingItem.id !== item.id)

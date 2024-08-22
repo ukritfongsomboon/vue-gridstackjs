@@ -10,9 +10,11 @@
         class="grid-stack-item"
         :gs-w="item.w"
         :gs-h="item.h"
+        :gs-x="item.x"
+        :gs-y="item.y"
         :gs-id="item.id"
         :id="item.id"
-        :gs-auto-position="true"
+        :gs-auto-position="false"
       >
         <!-- NOTE Content -->
         <div class="grid-stack-item-content">
@@ -66,7 +68,7 @@ const options: GridStackOptions = {
   // cellHeightThrottle: 100,
 
   // [x] สำหรับแก้จำนวน column Default:12
-  // column: 12,
+  column: 24,
 
   // []
   // columnOpts: {
@@ -139,6 +141,8 @@ onMounted(async () => {
 
   // [x] สำหรับ แก้ไข Layout ของ Widget
   grid.on('change', (_event: Event, nodes: GridStackNode[]) => {
+    // const nodes = grid.getGridItems()
+    console.log(nodes)
     nodes.forEach((node) => {
       const itemToUpdate = items.value.find((item) => item.id === node.id)
       if (itemToUpdate) {
@@ -190,7 +194,7 @@ watch(
 
 <style lang="scss">
 .grid-stack {
-  background: red !important;
+  // background: red !important;
   padding: 0;
   width: 100%;
   // height: 100% ;
@@ -244,18 +248,17 @@ watch(
   transform: translate(-50%, -50%);
 }
 
-
 // TODO Grid Stack Columns Configuration
 // https://github.com/gridstack/gridstack.js/blob/master/spec/e2e/html/810-many-columns.css
-// $columns: 48;
-// @function fixed($float) {
-//   @return calc(round($float * 1000) / 1000); // total 4-5 digits being %
-// }
-// .gs-#{$columns} > .grid-stack-item {
-//   width: fixed(calc(100% / $columns));
-//   @for $i from 1 through $columns - 1 {
-//     &[gs-x='#{$i}'] { left: fixed(calc(100% / $columns) * $i); }
-//     &[gs-w='#{$i}'] { width: fixed(calc(100% / $columns) * ($i)); }
-//   }
-// }
+$columns: 24;
+@function fixed($float) {
+  @return calc(round($float * 1000) / 1000); // total 4-5 digits being %
+}
+.gs-#{$columns} > .grid-stack-item {
+  width: fixed(calc(100% / $columns));
+  @for $i from 1 through $columns - 1 {
+    &[gs-x='#{$i}'] { left: fixed(calc(100% / $columns) * $i); }
+    &[gs-w='#{$i}'] { width: fixed(calc(100% / $columns) * ($i)); }
+  }
+}
 </style>
