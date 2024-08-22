@@ -16,7 +16,7 @@
     <grid-stack
       :disabled="disabled"
       :items="items"
-      style="width: 90%; height: 90%"
+      style="width: 90%; height: 70%"
       @on-delete="onRemove"
       @on-setting="onSetting"
       @on-update="onUpdate"
@@ -61,7 +61,7 @@ const items = ref([
 
 const disabled = ref<boolean>(false)
 // let onCreate = null
-const a = () => items.value.push({ id: `id_${Date.now()}`, x: 0, y: 0, w: 2, h: 2, content: '', autoPosition: true })
+const a = () => items.value.push({ id: `id_${Date.now()}`, x: 0, y: 0, w: 6, h: 2, content: '', autoPosition: true })
 
 const onRemove = (item: any) => {
   items.value = items.value.filter((existingItem) => existingItem.id !== item.id)

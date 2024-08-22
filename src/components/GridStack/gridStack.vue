@@ -14,7 +14,7 @@
         :gs-y="item.y"
         :gs-id="item.id"
         :id="item.id"
-        :gs-auto-position="false"
+        :gs-auto-position="item.autoPosition || false"
       >
         <!-- NOTE Content -->
         <div class="grid-stack-item-content">
@@ -156,6 +156,17 @@ onMounted(async () => {
     })
     emit('onUpdate', items.value)
   })
+
+  grid.on('added', (_event: Event, nodes: GridStackNode[]) => {
+    for (const idx in items.value) {
+      const x = nodes.find((n) => n.id === items.value[idx].id)
+      if (x) {
+        items.value[idx].x = x.x
+        items.value[idx].y = x.y
+        items.value[idx].autoPosition = false
+      }
+    }
+  })
 })
 
 // TODO Watch for changes in the prop and update the local variable accordingly
@@ -171,22 +182,33 @@ watch(
 watch(
   () => items.value,
   async (newValue: GridStackWidget[]) => {
+    console.log('watcher')
     if (!grid) return
 
-    const oldItems = await grid.getGridItems()
+    const oldItems = await Promise.all(grid.getGridItems())
 
-    // [x] Find elements in newValue that are not in oldItems
+    // // [x] Find elements in newValue that are not in oldItems
     const addedItems = newValue.filter((newItem) => !oldItems.some((oldItem) => oldItem.id === newItem.id))
     const removedItems = oldItems.filter((oldItem) => !newValue.some((newItem) => newItem.id === oldItem.id))
 
-    // [x] Add new widgets
+    // // [x] Add new widgets
     await Promise.all(addedItems.map(async (widget) => grid.makeWidget(`#${widget.id}`)))
 
-    // [x] Remove old widgets
+    // // [x] Remove old widgets
     await Promise.all(removedItems.map(async (widget) => grid.removeWidget(`#${widget.id}`, true)))
 
     // [x] Clear All Grid Position
-    await grid.compact()
+    grid.compact("list")
+    console.log("Compac");
+
+    // [] UPDATE New value to items
+
+    // console.log(grid.getGridItems())
+    // const x = grid.getGridItems().find((i) => addedItems.some((j) => i.id == j.id))?.gridstackNode
+    // console.log(x)
+    // items.value = items.value.map((item) => {
+    //   return { ...item, ...{ x: x?.x, y: x?.y } }
+    // })
   },
   { deep: true, immediate: true }
 )
@@ -257,8 +279,12 @@ $columns: 24;
 .gs-#{$columns} > .grid-stack-item {
   width: fixed(calc(100% / $columns));
   @for $i from 1 through $columns - 1 {
-    &[gs-x='#{$i}'] { left: fixed(calc(100% / $columns) * $i); }
-    &[gs-w='#{$i}'] { width: fixed(calc(100% / $columns) * ($i)); }
+    &[gs-x='#{$i}'] {
+      left: fixed(calc(100% / $columns) * $i);
+    }
+    &[gs-w='#{$i}'] {
+      width: fixed(calc(100% / $columns) * ($i));
+    }
   }
 }
 </style>
