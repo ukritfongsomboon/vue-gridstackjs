@@ -23,11 +23,15 @@
     >
       <template v-slot="{ item }">
         <div style="width: 100%; height: 100%; display: block; border-radius: inherit">
-          <ul>
+          <!-- <ul>
             <li>id : {{ item.id }}</li>
             <li>x : {{ item.x }} y: {{ item.y }}</li>
             <li>w : {{ item.w }} h : {{ item.h }}</li>
-          </ul>
+          </ul> -->
+          <canvas
+            :id="`chart_${item.id}`"
+            style="width: 100%; height: 100%"
+          ></canvas>
         </div>
       </template>
     </grid-stack>
@@ -48,7 +52,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import Chart from 'chart.js/auto'
+import type { ChartConfiguration } from 'chart.js'
+import { ref, onMounted } from 'vue'
 import gridStack from './components/GridStack/gridStack.vue'
 const items = ref([
   { id: 'id_7', x: 0, y: 0, w: 8, h: 4, content: '', autoPosition: false },
@@ -71,6 +77,39 @@ const onSetting = (item: any) => {
   alert(JSON.stringify(item))
 }
 const onUpdate = (_items: any) => {}
+
+onMounted(() => {
+  items.value.forEach((item) => {
+    const opt: any = {
+      type: 'bar',
+      options: {
+        borderRadius: 5,
+        barThickness: 5,
+        animation: false,
+        // responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          tooltip: {
+            enabled: true,
+          },
+        },
+      },
+      data: {
+        labels: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'],
+        datasets: [
+          {
+            label: 'Acquisitions by year',
+            data: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+          },
+        ],
+      },
+    }
+    new Chart(document.getElementById(`chart_${item.id}`) as HTMLCanvasElement, opt)
+  })
+})
 </script>
 
 <style scoped></style>

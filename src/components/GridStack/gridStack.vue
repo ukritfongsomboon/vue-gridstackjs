@@ -198,8 +198,7 @@ watch(
     await Promise.all(removedItems.map(async (widget) => grid.removeWidget(`#${widget.id}`, true)))
 
     // [x] Clear All Grid Position
-    grid.compact("list")
-    console.log("Compac");
+    grid.compact('list')
 
     // [] UPDATE New value to items
 
@@ -223,9 +222,11 @@ watch(
 }
 
 .grid-stack-item-content {
-  background-color: #18bc9c;
+  // background-color: #18bc9c;
+  background-color: #fff;
   border-radius: 0.5rem;
   padding: 1rem;
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
 }
 
 .grid-main-layout {
