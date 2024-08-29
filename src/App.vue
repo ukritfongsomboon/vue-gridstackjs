@@ -48,7 +48,9 @@
     <br />
     {{ items }}
     <br />
-    .
+    {{ charging }}|{{ chargingTime }}|{{ dischargingTime }}|{{ level }}
+    <br />
+    {{ isOnline }}|-{{ offlineAt }}|-{{ downlink }}|-{{ downlinkMax }}|-{{ effectiveType }}|-{{ saveData }}|-{{ type }}
   </div>
 </template>
 
@@ -74,6 +76,7 @@ const a = () => items.value.push({ id: `id_${Date.now()}`, x: 0, y: 0, w: 6, h: 
 
 // TODO เป็น Function สำหรับลบ Item
 const onRemove = (item: modelItem) => {
+  console.log(item)
   items.value = items.value.filter((existingItem: modelItem) => existingItem.id !== item.id)
 }
 
@@ -83,7 +86,9 @@ const onSetting = (item: modelItem) => {
 }
 
 // TODO เป็น Function สำหรับรับ Event Update Item (Move , Scale)
-const onUpdate = (_items: modelItem) => {}
+const onUpdate = (items: modelItem): void => {
+  console.log(items)
+}
 
 const onCreate = (item: modelItem) => {
   // TODO Create Chart js
@@ -140,6 +145,11 @@ onMounted(() => {
 const renderChart = (element: HTMLCanvasElement, options: any): void => {
   new Chart(element, options)
 }
+
+import { useBattery, useNetwork } from '@vueuse/core'
+
+const { charging, chargingTime, dischargingTime, level } = useBattery()
+const { isOnline, offlineAt, downlink, downlinkMax, effectiveType, saveData, type } = useNetwork()
 </script>
 
 <style scoped></style>

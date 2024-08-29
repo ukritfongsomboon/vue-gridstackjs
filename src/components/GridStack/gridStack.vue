@@ -173,6 +173,10 @@ onMounted(async () => {
       }
     }
   })
+
+  grid.on('removed', (_event: Event, _nodes: GridStackNode[]) => {
+    console.log(_event)
+  })
 })
 
 // TODO Watch for changes in the prop and update the local variable accordingly
@@ -188,10 +192,10 @@ watch(
 watch(
   () => items.value,
   async (newValue: GridStackWidget[]) => {
-    console.log('watcher')
     if (!grid) return
 
     const oldItems = await Promise.all(grid.getGridItems())
+    console.log(oldItems.length, '--', newValue.length)
 
     // // [x] Find elements in newValue that are not in oldItems
     const addedItems = newValue.filter((newItem) => !oldItems.some((oldItem) => oldItem.id === newItem.id))
@@ -201,19 +205,17 @@ watch(
     await Promise.all(addedItems.map(async (widget) => grid.makeWidget(`#${widget.id}`)))
 
     // // [x] Remove old widgets
-    await Promise.all(removedItems.map(async (widget) => grid.removeWidget(`#${widget.id}`, true)))
+    await Promise.all(
+      removedItems.map(async (widget) => {
+        const node = grid.engine.nodes.find((n) => widget === n.el)
+        if (!node) return
+        grid.engine.removeNode(node)
+      })
+    )
 
     // [x] Clear All Grid Position
-    grid.compact('list')
+    grid.compact()
 
-    // [] UPDATE New value to items
-
-    // console.log(grid.getGridItems())
-    // const x = grid.getGridItems().find((i) => addedItems.some((j) => i.id == j.id))?.gridstackNode
-    // console.log(x)
-    // items.value = items.value.map((item) => {
-    //   return { ...item, ...{ x: x?.x, y: x?.y } }
-    // })
   },
   { deep: true, immediate: true }
 )
